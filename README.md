@@ -13,6 +13,7 @@ Built with **GPT-6-Astra** in Codex.
 - **See the whole architecture.** Both models follow the structure of their papers, with animated paths connecting the components.
 - **Look inside.** Click a component or zoom toward it to reveal attention heads, expert routing, residual streams and memory.
 - **Play the story.** A 60-second camera tour compares attention, reuse, experts, memory, vision and drafting.
+- **Trace the lineage.** The **Lineage** panel sets sixteen published architectures — the 2017 base model, DeepSeek V1 through V4.1, Kimi k1.5 through K3, and GLM-130B through GLM-5 — side by side against *Attention Is All You Need*.
 - **Change the context.** Adjust the token count to explore the traffic and cache illustrations. Pause or slow the animation whenever you like.
 
 ![A close-up comparing attention in the two architectures](docs/screenshots/attention.png)
@@ -39,10 +40,28 @@ The app is plain JavaScript, CSS and HTML. Edit `dist/` and refresh the page.
 | `dist/presentation.mjs` | Attention, routing and other schematic calculations |
 | `dist/story.mjs` · `dist/camera-path.mjs` | Story captions, timing and camera movement |
 | `dist/facts.js` · `dist/sources.js` | Architecture facts and source notes |
+| `dist/lineage.js` | The sixteen-model comparison table and its citations |
 | `blender/architectures.blend` | Editable Blender models and detail geometry |
 | `scripts/build_spatial_architecture.py` | Rebuild the spatial models from the diagram data |
 
 See [development notes](docs/development.md) for Blender editing and checks.
+
+## The lineage table
+
+The **Lineage** panel compares sixteen published architectures against the 2017 paper:
+
+| Family | Models |
+| --- | --- |
+| Transformer | Transformer base (2017) |
+| GLM | GLM-130B · ChatGLM2-6B · ChatGLM3-6B · GLM-4-9B · GLM-4.5 · GLM-5 |
+| DeepSeek | DeepSeek LLM 67B · V2 · V3 · V4-Flash · V4-Pro · V4.1-Flash |
+| Kimi | k1.5 · K2 · K3 |
+
+Every figure is copied from a primary source — the model's own paper, its official `config.json`, or its vendor model card. Nothing is filled in from secondary reporting, and a figure no primary source states is left as an em dash rather than estimated. Kimi k1.5 publishes no architecture at all, so most of its row is blank; that blankness is the finding, not an omission. Where a paper and its own configuration disagree, the table follows the configuration.
+
+`tests/lineage.mjs` checks the table against `tests/fixtures/lineage-configs.json`, a frozen copy of the thirteen official configurations, so a layer, width, head or expert count cannot drift from what its vendor published. It also enforces the sourcing rule: every citation must resolve to arxiv.org, huggingface.co or github.com.
+
+Only the 2017 base model and DeepSeek V4.1 Flash exist as 3D geometry. The other fourteen rows are data, not scenes.
 
 ## Sources and scope
 
