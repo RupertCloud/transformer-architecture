@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {lineage,baseline,lineageHTML,formatParameters,formatContext,formatReleased} from '../dist/lineage.js';
 import {facts} from '../dist/facts.js';
+import {logScale,parameterChart,contextChart,parameterTicks,contextTicks,chartPalette} from '../dist/lineage-chart.js';
 const root=new URL('../',import.meta.url);
 const configs=JSON.parse(await readFile(new URL('tests/fixtures/lineage-configs.json',root),'utf8'));
 const checks=[];
@@ -130,6 +131,59 @@ check('The rendered tables cover every model, every source and mark unstated cel
  // Kimi k1.5 contributes the most blanks; the table must not quietly drop it.
  assert.ok(lineageHTML.includes('Kimi k1.5'));
  assert.ok(!/undefined|NaN|\[object/.test(lineageHTML));
+});
+
+check('The log scale is monotonic and pins its domain to the plot area',()=>{
+ const scale=logScale(100,1e6,10,610);
+ assert.equal(scale(100),10);
+ assert.equal(scale(1e6),610);
+ assert.equal(scale(1000).toFixed(1),'160.0');
+ let previous=-Infinity;
+ for(const v of [100,500,1000,50000,1e6]){const x=scale(v);assert.ok(x>previous,String(v));previous=x;}
+});
+
+check('Both charts draw a row for every model and never drop one for missing data',()=>{
+ const marks=svg=>[...svg.matchAll(/<circle cx="([\d.]+)"/g)].map(m=>+m[1]);
+ for(const [svg,ticks,plottable] of [
+  [parameterChart(lineage,formatParameters),parameterTicks,lineage.filter(m=>m.params)],
+  [contextChart(lineage,formatContext),contextTicks,lineage.filter(m=>m.context!==null)]]){
+  for(const m of lineage)assert.ok(svg.includes('>'+m.name+'<'),m.id+' row label');
+  const drawn=marks(svg);
+  assert.ok(drawn.length>=plottable.length,'a mark per plottable model');
+  // Nothing escapes the plot area, and every tick sits inside it too.
+  const [,width]=svg.match(/viewBox="0 0 (\d+)/).map(Number);
+  for(const x of drawn)assert.ok(x>=150&&x<=width,'mark inside the plot: '+x);
+  for(const t of ticks)assert.ok(svg.includes('>'+t.label+'<'),'tick '+t.label);
+ }
+});
+
+check('A model with no published figure gets a stated reason, not a mark',()=>{
+ const parameters=parameterChart(lineage,formatParameters),context=contextChart(lineage,formatContext);
+ assert.ok(parameters.includes('no architecture published'),'Kimi k1.5 says why it has no dumbbell');
+ assert.ok(context.includes('no fixed limit stated in the paper'),'the 2017 row says why it has no dot');
+ // A lone total dot would read as dense, so V4.1 states its prefill/decode figures.
+ const v41=lineage.find(m=>m.id==='deepseek-v4.1-flash');
+ assert.equal(v41.params.active,null);
+ assert.ok(parameters.includes(v41.activeNote+' active'),'V4.1 states its published active figures');
+});
+
+check('Marks carry a hover label and extremes are direct-labelled once each',()=>{
+ const parameters=parameterChart(lineage,formatParameters),context=contextChart(lineage,formatContext);
+ for(const svg of [parameters,context]){
+  const dots=(svg.match(/<circle /g)||[]).length,titles=(svg.match(/<title>/g)||[]).length;
+  assert.equal(dots,titles,'every mark has a hover label');
+ }
+ const visible=(svg,text)=>(svg.match(new RegExp('font-size="11">'+text+'<','g'))||[]).length;
+ assert.equal(visible(context,'1,048,576'),1,'four models share the 1M maximum; label it once');
+ assert.equal(visible(context,'2,048'),1);
+ assert.equal(visible(parameters,'2.8T'),1);
+ assert.equal(visible(parameters,'65M'),1);
+});
+
+check('The chart palette is the one validated against this dialog surface',()=>{
+ assert.equal(chartPalette.total,'#35a79b');
+ assert.equal(chartPalette.active,'#bd8130');
+ assert.notEqual(chartPalette.total,chartPalette.active);
 });
 
 console.log(checks.map(c=>'  ✓ '+c).join('\n'));

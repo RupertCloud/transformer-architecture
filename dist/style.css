@@ -68,3 +68,10 @@ dialog{background:#101f2d;color:#d6e5ee;border:1px solid #3b596d;border-radius:1
 .lineage-sources li{margin-bottom:5px}
 .lineage-sources strong{color:#e1edf4;font-weight:500}
 @media(max-width:520px){#lineage-content{font-size:15px}#lineage-content table{font-size:12px}.lineage-scroll table{min-width:620px}.lineage-sources{font-size:12px}}
+
+.lineage-figure{margin:14px 0 0}
+.lineage-figure figcaption{color:#e1edf4;font-size:14px;margin-bottom:6px}
+.lineage-figure svg{width:100%;height:auto;display:block}
+.lineage-legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin:0 0 4px}
+.lineage-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+@media(max-width:520px){.lineage-figure figcaption{font-size:13px}}

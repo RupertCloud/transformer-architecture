@@ -13,7 +13,7 @@ Built with **GPT-6-Astra** in Codex.
 - **See the whole architecture.** Both models follow the structure of their papers, with animated paths connecting the components.
 - **Look inside.** Click a component or zoom toward it to reveal attention heads, expert routing, residual streams and memory.
 - **Play the story.** A 60-second camera tour compares attention, reuse, experts, memory, vision and drafting.
-- **Trace the lineage.** The **Lineage** panel sets sixteen published architectures — the 2017 base model, DeepSeek V1 through V4.1, Kimi k1.5 through K3, and GLM-130B through GLM-5 — side by side against *Attention Is All You Need*.
+- **Trace the lineage.** The **Lineage** panel sets sixteen published architectures — the 2017 base model, DeepSeek V1 through V4.1, Kimi k1.5 through K3, and GLM-130B through GLM-5 — side by side against *Attention Is All You Need*, as two charts and three tables.
 - **Change the context.** Adjust the token count to explore the traffic and cache illustrations. Pause or slow the animation whenever you like.
 
 ![A close-up comparing attention in the two architectures](docs/screenshots/attention.png)
@@ -41,12 +41,15 @@ The app is plain JavaScript, CSS and HTML. Edit `dist/` and refresh the page.
 | `dist/story.mjs` · `dist/camera-path.mjs` | Story captions, timing and camera movement |
 | `dist/facts.js` · `dist/sources.js` | Architecture facts and source notes |
 | `dist/lineage.js` | The sixteen-model comparison table and its citations |
+| `dist/lineage-chart.js` | The dumbbell and dot plots drawn over that data |
 | `blender/architectures.blend` | Editable Blender models and detail geometry |
 | `scripts/build_spatial_architecture.py` | Rebuild the spatial models from the diagram data |
 
 See [development notes](docs/development.md) for Blender editing and checks.
 
 ## The lineage table
+
+![The lineage panel, showing total against active parameters for sixteen architectures](docs/screenshots/lineage.png)
 
 The **Lineage** panel compares sixteen published architectures against the 2017 paper:
 
@@ -60,6 +63,8 @@ The **Lineage** panel compares sixteen published architectures against the 2017 
 Every figure is copied from a primary source — the model's own paper, its official `config.json`, or its vendor model card. Nothing is filled in from secondary reporting, and a figure no primary source states is left as an em dash rather than estimated. Kimi k1.5 publishes no architecture at all, so most of its row is blank; that blankness is the finding, not an omission. Where a paper and its own configuration disagree, the table follows the configuration.
 
 `tests/lineage.mjs` checks the table against `tests/fixtures/lineage-configs.json`, a frozen copy of the thirteen official configurations, so a layer, width, head or expert count cannot drift from what its vendor published. It also enforces the sourcing rule: every citation must resolve to arxiv.org, huggingface.co or github.com.
+
+Two charts open the panel. The first plots total parameters against the parameters that actually run for one token: dense models show a single dot, and from DeepSeek-V2 onward the two dots separate, so the gap is the mixture-of-experts sparsity. The second plots the published context window. Both are position-encoded on a log axis — no mark implies a length measured from zero — and both draw a row for every model, so a figure that was never published shows its reason in the plot area instead of vanishing from the chart.
 
 Only the 2017 base model and DeepSeek V4.1 Flash exist as 3D geometry. The other fourteen rows are data, not scenes.
 

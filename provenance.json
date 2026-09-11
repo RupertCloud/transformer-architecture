@@ -33,7 +33,7 @@
       "sha256": "4df5d7c64e8015b826d0d27e3c8357230a66dc6229b2430d83d53c5d7ee6e7ee"
     }
   },
-  "interaction_revision": "Revision 10: Revision 9 plus a Lineage panel comparing sixteen published architectures against the 2017 paper. Explore by default; optional one-minute story opens with both models side by side and keeps that layout throughout. Continuous camera paths move between 17 short, source-grounded beats without cuts or static holds; chapter navigation glides to its destination.",
+  "interaction_revision": "Revision 11: Revision 10 plus two charts opening the Lineage panel \u2014 a dumbbell of total against active parameters and a dot plot of context window, both log-scaled. Revision 9 plus a Lineage panel comparing sixteen published architectures against the 2017 paper. Explore by default; optional one-minute story opens with both models side by side and keeps that layout throughout. Continuous camera paths move between 17 short, source-grounded beats without cuts or static holds; chapter navigation glides to its destination.",
   "diagram_checks": {
     "original_nodes": 24,
     "original_edges": 30,
@@ -58,7 +58,21 @@
       "models": 13,
       "sha256": "9c50e3caaf86ab27cb7a00ee403da003010731943bfad0de62cc91b3830236d8"
     },
-    "scope": "Published architecture shape only. Not a benchmark, not a cost model, and not geometry: only the 2017 base model and DeepSeek V4.1 Flash exist as 3D scenes."
+    "scope": "Published architecture shape only. Not a benchmark, not a cost model, and not geometry: only the 2017 base model and DeepSeek V4.1 Flash exist as 3D scenes.",
+    "charts": {
+      "forms": [
+        "dumbbell: total vs active parameters",
+        "dot plot: context window"
+      ],
+      "scale": "log10 on the value axis; position-encoded marks only, so no length is read from zero",
+      "series_colours": {
+        "total": "#35a79b",
+        "active": "#bd8130",
+        "surface": "#101f2d"
+      },
+      "colour_validation": "Passes lightness band, chroma floor, CVD adjacent-pair separation, normal-vision floor and contrast against the dialog surface.",
+      "missing_data": "Every model keeps its row; an unpublished figure prints its reason in the plot area instead of a mark."
+    }
   },
   "motion": "Concurrent grouped activation pathways, schematic attention and expert routing, not inference timing. DSpark illustrates an accepted prefix of three of five candidates.",
   "story": {
