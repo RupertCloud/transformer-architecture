@@ -26,7 +26,9 @@ With Node.js 22 or later installed:
 npm test
 ```
 
-No `npm install` is needed. The checks cover architecture facts against the frozen configuration, KV/index producer schedules, causal masks, graph-to-GLB consistency, cache accounting, story timing, playback and camera continuity. They do not execute the neural models or benchmark inference.
+No `npm install` is needed. The checks cover architecture facts against the frozen configuration, KV/index producer schedules, causal masks, graph-to-GLB consistency, cache accounting, story timing, playback and camera continuity, and the lineage table against `tests/fixtures/lineage-configs.json` — a frozen copy of thirteen official `config.json` files. They do not execute the neural models or benchmark inference.
+
+To add a model to the lineage table, append an entry to `dist/lineage.js` and add its official configuration to that fixture. Every figure must come from the model's own paper, its official config or its vendor model card; a figure no primary source states stays `null`. The checks reject a citation that does not resolve to arxiv.org, huggingface.co or github.com.
 
 For visual changes, inspect the populated app at both wide and narrow widths, and play the story through to completion. Mobile uses one model at a time in Explore and keeps both models visible in Story mode.
 
