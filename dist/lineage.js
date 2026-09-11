@@ -1,4 +1,5 @@
 import {facts} from './facts.js';
+import {parameterChart,contextChart} from './lineage-chart.js';
 
 // Every figure here is copied from a primary source: the model's own paper, its
 // official configuration file, or its vendor model card. Nothing is inferred
@@ -132,6 +133,7 @@ export const lineage=[
  {id:'deepseek-v4.1-flash',family:'DeepSeek',name:'DeepSeek-V4.1-Flash',released:'2026-09',scene:true,
   params:{total:facts.deepseek.backboneParameters,active:null,
    note:'552B backbone plus 196B Engram; 8B active in prefill, 16B in decode'},
+  activeNote:'8B prefill · 16B decode',
   layers:facts.deepseek.layers,layerNote:`${facts.deepseek.encoder} encoder + ${facts.deepseek.decoder} decoder`,
   hidden:facts.deepseek.hidden,heads:facts.deepseek.heads,
   attention:`Sparse indexed, ${facts.deepseek.heads} heads × ${facts.deepseek.headDim}, top-${facts.deepseek.topk}, window ${facts.deepseek.window}`,
@@ -169,7 +171,7 @@ const mechanismRow=m=>`<tr${m.baseline?' class="baseline"':''}>${name(m)}${cell(
 const sourceItem=m=>`<li><strong>${m.name}</strong> ${m.sources.map(s=>`<a href="${s.url}" target="_blank" rel="noopener">${s.label} ↗</a>`).join(' · ')}</li>`;
 
 export const lineageHTML=`<p>Sixteen published architectures, oldest first, each read against <a href="${baseline.sources[0].url}" target="_blank" rel="noopener">Attention Is All You Need ↗</a>. Every figure is copied from a primary source — the model's own paper, its official configuration file, or its vendor model card. An em dash means no primary source states that figure; nothing here is filled in from secondary reporting.</p>
-<h3>Scale</h3><div class="lineage-scroll"><table><thead><tr><th scope="col">Model</th><th scope="col">Released</th><th scope="col">Total</th><th scope="col">Active</th><th scope="col">Layers</th><th scope="col">Width</th><th scope="col">Context</th></tr></thead><tbody>${lineage.map(scaleRow).join('')}</tbody></table></div>
+<h3>The shape of the change</h3>${parameterChart(lineage,formatParameters)}<p>Nothing is dense after 2024. Every model up to DeepSeek-V2 spends its whole parameter count on every token, so its two dots land on top of each other; from V2 onward the dots separate and the gap is what the mixture of experts skips. Kimi k1.5 has no row to draw. DeepSeek-V4.1-Flash publishes prefill and decode figures rather than one active number, so its row states them instead of drawing a mark.</p>${contextChart(lineage,formatContext)}<p>The 2017 paper states no fixed context limit, so the baseline has no mark; GLM-130B's 2,048 tokens is the shortest published maximum here and the 2026 models reach 1,048,576.</p><h3>Scale</h3><div class="lineage-scroll"><table><thead><tr><th scope="col">Model</th><th scope="col">Released</th><th scope="col">Total</th><th scope="col">Active</th><th scope="col">Layers</th><th scope="col">Width</th><th scope="col">Context</th></tr></thead><tbody>${lineage.map(scaleRow).join('')}</tbody></table></div>
 <p style="margin-top:12px">Active parameters are those that run for a single token. For the dense models the two columns are equal, which is the whole point of the comparison: the 2017 block spends every parameter on every token, and so does everything up to DeepSeek-V2. Context is the architectural maximum in the configuration, not a serving default; the 2017 paper states no fixed limit.</p>
 <h3>Mechanism</h3><div class="lineage-scroll"><table><thead><tr><th scope="col">Model</th><th scope="col">Attention</th><th scope="col">Feed-forward</th><th scope="col">Position</th><th scope="col">Normalisation</th></tr></thead><tbody>${lineage.map(mechanismRow).join('')}</tbody></table></div>
 <h3>What each one changed</h3><table><tbody>${lineage.filter(m=>!m.baseline).map(m=>`<tr><th scope="row">${m.name}</th><td>${m.departure}</td></tr>`).join('')}</tbody></table>
